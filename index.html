@@ -10,7 +10,7 @@
 	<header class="caption">
 		<img src="images/bug-o-meter.png" width="600" height="190" />
 	</header>
-  <h2> Bugzilla </h2>
+  <h2>Bugzilla</h2>
     <ul>
       <li>Bugs open: <span id="new"></span></li>
       <li>Patches: <span id="attachments"></span></li>
@@ -45,8 +45,6 @@ function display(obj) {
   var ids = ["new", "attachments", "comments", "review_asked", "cc"];
   for (var i in ids) {
     var closed = document.querySelector("#" + ids[i]);
-    console.log(ids[i])
-    console.log(obj)
     if (obj[ids[i]]) {
       closed.innerHTML = obj[ids[i]].length;
     } else {
@@ -97,7 +95,6 @@ function process(events) {
   for (var e of events) {
     var date = new Date(e.created_at);
     if (date >= left && date <= right) {
-      console.log(e.repo);
       if (e.repo && e.repo.name.search("mozilla") != -1) {
         console.log(e.type);
         switch (e.type) {
@@ -125,7 +122,6 @@ function process(events) {
 
 function displaygh() {
   var things = ["pr", "issues", "fork", "other"];
-  console.log(counters);
   for (var i = 0; i < things.length; i++) {
     var e = document.getElementById(things[i]);
     e.innerHTML = counters[things[i]];
@@ -141,12 +137,12 @@ function fetch_names(cb) {
           cb(request.responseText);
         }
       } else {
-      console.log("name fetch failed.");
+        console.log("name fetch failed.");
       }
     }
   });
 
-  request.open("GET", "gh-names", true);
+  request.open("GET", "file:///home/thegennok/Downloads/bug-o-meter/gh-names", true);
   request.send(null);
 }
 
