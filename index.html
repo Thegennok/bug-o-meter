@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<title>Bug-O-meter</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="fonts/fonts.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body class="home">
+	<header class="caption">
+		<img src="images/bug-o-meter.png" width="600" height="190" />
+	</header>
+  <h2> Bugzilla </h2>
+    <ul>
+      <li>Bugs open: <span id="new"></span></li>
+      <li>Patches: <span id="attachments"></span></li>
+      <li>Comments: <span id="comments"></span></li>
+      <li>Review asked: <span id="review_asked"></span></li>
+      <li>CC: <span id="cc"></span></li>
+    </ul>
+    <h2>GitHub</h2>
+    <ul>
+      <li> Pull requests&nbsp;: <span id="pr"></span></li>
+      <li> Issues&nbsp;: <span id="issues"></span></li>
+      <li> Fork&nbsp;: <span id="fork"></span></li>
+      <li> Other&nbsp;: <span id="other"></span></li>
+    </ul>
+
+    <footer id=etherpad>
+    <p>
+      Put your Bugzilla emails here: <a href="https://etherpad.mozilla.org/mbsp-paris-juin-14">https://etherpad.mozilla.org/mbsp-paris-juin-14</a>
+    </p>
+    <p>
+      Put yours nicknames GitHub: <a href="https://etherpad.mozilla.org/mbsp-paris-juin-14-gh">https://etherpad.mozilla.org/mbsp-paris-juin-14-gh</a>
+    </p>
+    </footer>
+    <script>
+// Put the begin date and the end date here
+var left = new Date("2014-06-21T10:00:00Z");
+var right = new Date("2014-06-22T18:00:00Z");
+// Path to your JSON file (here protected versus CORS)
+var prod = "http://www.corsproxy.com/thegennok.com/bug/bugs.json";
+
+function display(obj) {
+  var ids = ["new", "attachments", "comments", "review_asked", "cc"];
+  for (var i in ids) {
+    var closed = document.querySelector("#" + ids[i]);
+    console.log(ids[i])
+    console.log(obj)
+    if (obj[ids[i]]) {
+      closed.innerHTML = obj[ids[i]].length;
+    } else {
+      closed.innerHTML = "0";
+    }
+  }
+}
+function fetch() {
+  var request = new XMLHttpRequest();
+  request.addEventListener("readystatechange", function (e) {
+    if (request.readyState == 4) {
+      if (request.status == 200) {
+        if (request.responseText.length) {
+          console.log(request.responseText);
+          display(JSON.parse(request.responseText));
+        }
+        } else {
+          console.log("bz fetch failed.");
+        }
+    }
+  });
+
+  request.open("GET", prod + "?" + Math.random(), true);
+  request.send(null);
+}
+
+setInterval(fetch, 60 * 1000);
+var counters = {"pr":0, "issues":0, "fork":0, "other":0};
+function fetchgh(url, cb) {
+  var request = new XMLHttpRequest();
+  request.addEventListener("readystatechange", function (e) {
+    if (request.readyState == 4) {
+      if (request.status == 200) {
+        if (request.responseText.length) {
+          process(JSON.parse(request.responseText));
+        }
+      } else {
+        console.log("gh fetch failed.");
+      }
+    }
+  });
+
+  request.open("GET", url, true);
+  request.send(null);
+}
+
+function process(events) {
+  for (var e of events) {
+    var date = new Date(e.created_at);
+    if (date >= left && date <= right) {
+      console.log(e.repo);
+      if (e.repo && e.repo.name.search("mozilla") != -1) {
+        console.log(e.type);
+        switch (e.type) {
+          case "IssuesEvent":
+            counters["issues"]++;
+            break;
+          case "PullRequestEvent":
+            counters["pr"]++;
+            break;
+          case "ForkEvent":
+            counters["fork"]++;
+            break;
+          default:
+            counters["other"]++;
+            break;
+        }
+      } else {
+        console.log(e.repo.name + " is not a mozilla repo");
+      }
+    }
+  }
+
+  displaygh();
+}
+
+function displaygh() {
+  var things = ["pr", "issues", "fork", "other"];
+  console.log(counters);
+  for (var i = 0; i < things.length; i++) {
+    var e = document.getElementById(things[i]);
+    e.innerHTML = counters[things[i]];
+  }
+}
+
+function fetch_names(cb) {
+  var request = new XMLHttpRequest();
+  request.addEventListener("readystatechange", function (e) {
+    if (request.readyState == 4) {
+      if (request.status == 200) {
+        if (request.responseText.length) {
+          cb(request.responseText);
+        }
+      } else {
+      console.log("name fetch failed.");
+      }
+    }
+  });
+
+  request.open("GET", "gh-names", true);
+  request.send(null);
+}
+
+function gh() {
+  fetch_names(function(names) {
+    users = names.split("\n");
+    console.log(users)
+    var url = "https://api.github.com/users/{{user}}/events";
+    done = 0;
+    count = users.length;
+    for (i in counters) {
+      counters[i] = 0;
+    }
+    for (var i in users) {
+      if (users[i]) {
+        fetchgh(url.replace("{{user}}", users[i]) , process);
+      } else {
+        count--;
+      }
+    }
+});
+}
+
+setInterval(gh, 60 * 1000);
+gh();
+    </script>
+</body>
+</html>

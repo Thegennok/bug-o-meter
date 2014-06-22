@@ -1,0 +1,55 @@
+body {
+  font:15px 'fira_sansthin', sans-serif;
+  margin:0;
+  padding:0;
+  border:0;
+  color:#fff;
+}
+
+body:after {
+  position:absolute;
+  top:0;
+  right:10px;
+  width:153px;
+  height:41px;
+  background:url(images/tab-2.png);
+  content:'';
+}
+
+.home {
+  float:left;
+  margin-left: 1em;
+  background:#0095DD;
+}
+
+.home {
+  text-shadow:0 1px 1px #000;
+}
+
+.home h1 {
+  font:bold 40px 'fira_sanslight', sans-serif;
+  margin-bottom: 1em;
+}
+ul {
+  list-style:none;  
+}
+
+.home li {
+  font: bold 15px 'fira_sansthin', sans-serif;
+}
+
+#panda {
+  transform: translateY(0.8em);
+}
+
+
+#etherpad {
+  font: 15px 'fira_sanslight', sans-serif;
+  position: absolute;
+  bottom: 1em;
+}
+
+a {
+  text-decoration:none;
+  color: #ddd;
+}
