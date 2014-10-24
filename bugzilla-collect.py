@@ -8,8 +8,8 @@ from collections import Counter
 import json
 
 def collectReports(doc):
-    tableElem = doc.find_all(id="report")[0]
-    headerElem = doc.find_all(id="report-header")[0]
+    tableElem = doc.find(id="report")
+    headerElem = doc.find(id="report-header")
     headerElems = headerElem.find_all("th")
     header = [''.join(list(col.stripped_strings)) for col in headerElems]
 
@@ -53,25 +53,10 @@ def queryReport(emails, startDate, endDate):
 
 def loadValidReport(emails, startDate, endDate):
     doc = queryReport(emails, startDate, endDate)
-    newEmails = removeUnregisteredEmails(doc, emails)
-    if emails == newEmails:
-        return doc
-    emails = newEmails
-    print emails
-    doc = queryReport(emails, startDate, endDate)
-    newEmails2 = removeUnregisteredEmails(doc, emails)
-    if emails == newEmails2:
-        return doc
-    print "Cannot reach fix point of valid emails"
-    return None
-    ### For testing.
-    # f = open("fake-replay.html")
-    # doc = BeautifulSoup(f.read())
-    # f.close()
-    # return doc
+    return doc
 
 def readEmails():
-    response = urllib2.urlopen('http://etherpad.mozilla.org/ep/pad/export/mbsp-paris-juin-14/latest?format=txt')
+    response = open("bugzilla.txt")
     html = response.readlines()
     emails = []
     for line in html:
@@ -80,13 +65,6 @@ def readEmails():
     response.close()
     lalala = ",".join(emails)
     return lalala
-
-def readEmails2():
-    response = urllib2.urlopen('http://etherpad.mozilla.org/ep/pad/export/mbsp-paris-juin-14-gh/latest?format=txt')
-    html = response.read()
-    f = open("gh-names", "w")
-    f.write(html)
-    f.close
 
 matchDate = re.compile('^\d{4}-\d{2}-\d{2}$')
 if len(sys.argv) < 3:
@@ -124,5 +102,3 @@ printWhoLists("review_given", giveReview, out)
 printWhoLists("cc", cc, out)
 printWhoLists("comments", comment, out)
 print json.dumps(out)
-
-readEmails2()

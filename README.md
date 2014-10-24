@@ -6,23 +6,20 @@ bug-o-meter for mozilla bugs squashing event
 
 ## Requirement
 
-Yous need to have BeatifulSoup 4 on your computer
+You need to have BeatifulSoup 4 and php5-curl on your computer
+
 ``` sh
-sudo apt-get install python-setuptools && sudo easy_install beautifulsoup4
+sudo apt-get install python-bs4 php5-curl
 ```
 
 ## How to use
 
-You have to create two different files (in this code, we use etherpad). One with Bugzilla mail and one with Github nickname, one by line each time.
+Change the two date in the top of cron.php
 
-Put this file online (or not) and change line 74 and 85 of bugzilla-collect.py
+PHP need to have write permission on this folder
 
-Then launch this script :
+People can add their Bugzilla and/or Github account on index.php?add
 
-``` sh
- while : ; do python bugzilla-collect.py 2014-06-21 2014-06-22 > bugs.json.tmp && mv bugs.json.tmp bugs.json ; sleep 60; done
-``` 
+Use a crontab (or whatever) for run cron.php. No argument needed.
 
-You have to put the adress of bugs.json on line 42 of index.html (you may have to protect of CORS).
-
-It's all done !
+The bugzilla-collect.py script have been made by http://github.com/nbp
