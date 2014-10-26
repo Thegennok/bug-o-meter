@@ -43,19 +43,21 @@ foreach($nicks as $nick) {
 		$date = substr($event["created_at"], 0, strpos($event["created_at"], "T"));
 		$date = strtotime($date);
 		if ($date >= $from && $date <= $to) {
-			switch ($event["type"]) {
-				case "IssuesEvent":
-					$bug["git"]["is"]++;
-					break;
-				case "PullRequestEvent":
-					$bug["git"]["pr"]++;
-					break;
-				case "ForkEvent":
-					$bug["git"]["fo"]++;
-					break;
-				default:
-					$bug["git"]["ot"]++;
-					break;
+			if (strstr($event["repo"]["name"], "mozilla") !== false) {
+				switch ($event["type"]) {
+					case "IssuesEvent":
+						$bug["git"]["is"]++;
+						break;
+					case "PullRequestEvent":
+						$bug["git"]["pr"]++;
+						break;
+					case "ForkEvent":
+						$bug["git"]["fo"]++;
+						break;
+					default:
+						$bug["git"]["ot"]++;
+						break;
+				}
 			}
 		}
 	}
